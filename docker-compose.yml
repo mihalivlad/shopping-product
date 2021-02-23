@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - 3308:3306
+    networks:
+      - products-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=products
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 30s
+      retries: 2
+
+  shopping-product:
+    image: products
+    container_name: products-container
+    ports:
+      - 8081:8081
+    networks:
+      - products-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+networks:
+  products-network:
